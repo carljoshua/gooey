@@ -3,11 +3,11 @@
 package dbm
 
 import(
-	"fmt"
+	//"fmt"
 	"net/http"
 	"database/sql"
-	"encoding/json"
 	"strings"
+	"html/template"
 )
 
 var (
@@ -34,56 +34,69 @@ func Sync(connection *sql.DB, port_num string, driver_name string){
 }
 
 func Serve(){
-	http.HandleFunc("/graph/", RenderJSON)
-	http.Handle("/", http.FileServer(http.Dir("client")))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	http.HandleFunc("/golangmyadmin/", Render)
 	http.ListenAndServe(port, nil)
 }
 
-func RenderJSON(w http.ResponseWriter, r *http.Request){
-	columns, data := ShowData("SELECT file, title FROM resource")
-	result := &ResultSet{Column: columns, Result: data}
-	
+func Render(w http.ResponseWriter, r *http.Request){
 	table_list := ShowTables()
+	context := &Content{Tables: table_list, Data: nil}
+	active := r.URL.Path[len("/golangmyadmin/"):]
 
-	context := &Content{Tables: table_list, Data: result}
-	jsoned, _ := json.Marshal(context)
-	fmt.Fprintf(w, "%s", jsoned)
-}
-
-//GetColumn() returns one column of the resulting query
-func GetColumn(row string, table string) ([]string){
-	res, err := db.Query("SELECT " + row + " FROM " + table)
-	if err != nil{
-		panic(err)
+	result := &ResultSet{Column: nil, Result: nil}
+	if r.Method == "POST" || strings.Contains(active, "browse="){
+		var query string 
+		if strings.Contains(active, "browse="){
+			query = "SELECT COUNT(*) FROM " + active[len("browse="):]
+		}else{
+			query = r.FormValue("query")
+		}
+		columns, data := ShowData(query)
+		result.Column = columns
+		result.Result = data
+		context.Data = result
 	}
-
-	var tmp string
-	var result []string
-	for res.Next(){
-		res.Scan(&tmp)
-		result = append(result, tmp)
+	
+	var gui *template.Template
+	switch active{
+		case "exec":
+			gui = template.Must(template.New("main").ParseFiles("base.html", "sql.html"))
+		case "result":
+			gui = template.Must(template.New("main").ParseFiles("base.html", "result.html"))
+		default:
+			if strings.Contains(active, "browse="){
+				gui = template.Must(template.New("main").ParseFiles("base.html", "result.html"))
+			}else{
+				gui = template.Must(template.New("main").ParseFiles("base.html"))
+			}
 	}
-	return result
-}
-
-//PreprocessQuery() returns the a slice containing the columns in the query and a string containing the table
-func PreprocessQuery(q string) ([]string, string){
-	q = strings.TrimPrefix(q, "SELECT ")
-	tmp := strings.Split(q, " FROM ")
-	cols := strings.Split(tmp[0], ",")
-	return cols, tmp[1]
+	
+	gui.ExecuteTemplate(w, "base", context)
 }
 
 //ShowData() fetches the data of SELECT query
-func ShowData(q string) ([]string, [][]string){
-	cols, table := PreprocessQuery(q)
-	var data [][]string
-	for _, val := range cols{
-		tmp := GetColumn(val, table)
-		data = append(data, tmp)
+func ShowData(q string ) ([]string, [][]string){
+	res, err := db.Query(q)
+	var rows [][]string
+	if err != nil{
+		panic(err)
 	}
-	data = Transpose(data)
-	return cols, data
+	col_names, _ := res.Columns()
+	for res.Next(){
+		pointers := make([]interface{}, len(col_names))
+		tmp := make([]string, len(col_names))
+		for i, _ := range col_names{
+			pointers[i] = &tmp[i]
+		}
+		err := res.Scan(pointers...)
+		if err != nil{
+			panic(err)
+		}
+		rows = append(rows, tmp)
+	}
+
+	return col_names, rows
 }
 
 //ShowTables() fetches the tables inside the selected database
@@ -107,19 +120,4 @@ func ShowTables() []string {
 		tables = append(tables, tmp)
 	}
 	return tables
-}
-
-//Transpose() rearranges the result set into much more simple arrangement
-func Transpose(set [][]string) [][]string{
-	var formatted [][]string
-	var row []string
-	var empty []string
-	for i := 0; i < len(set[0]); i++{
-		for ix := 0; ix < len(set); ix++{
-			row = append(row, set[ix][i])
-		}
-		formatted = append(formatted, row)
-		row = empty
-	}
-	return formatted
 }
