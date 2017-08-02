@@ -1,11 +1,8 @@
-//Package golangmyadmin lets you manage database with intuitive web-based GUI
-
 package golangmyadmin
 
 import(
 	"net/http"
 	"database/sql"
-	"strings"
 )
 
 var (
@@ -25,34 +22,33 @@ func Run(database *sql.DB, db_name string, port string) {
 
 
 func Execute(w http.ResponseWriter, r *http.Request){
-	_, table_list, _ := db.GetRow(db.TableQ())
-	content := &Content{Tables: table_list}
-	
-	active := r.URL.Path[len("/golangmyadmin/"):]
+	var tmpl string
+	table_list := make(map[string]bool)
 
-	if r.Method == "POST" || strings.Contains(active, "browse="){
-		var query string 
-		if strings.Contains(active, "browse="){
-			query = "SELECT * FROM " + active[len("browse="):]
-		}else{
-			query = r.FormValue("query")
-		}
-		columns, data, _ := db.GetRows(query)
-		result := &ResultSet{Column: columns, Result: data}
-		content.Data = result
+	_, tables, _ := db.GetRow(db.TableQ())
+	for _, name := range tables{
+		table_list[name] = false
 	}
+
+
+	c := &Content{Tables: table_list}
 	
-	switch active{
-		case "exec":
-			Render(w, "query", content)
+	switch r.URL.Query().Get("do"){
+		case "browse":
+			table := r.URL.Query().Get("table")
+			c.Tables[table] = true
+			col, res, _ := db.GetRows("SELECT * FROM " + table)
+			c.Data = &ResultSet{Column: col, Result: res}
+			tmpl = "result"
+		case "sql":
+			tmpl = "query"
 		case "result":
-			Render(w, "result", content)
+			col, res, _ := db.GetRows(r.FormValue("query"))
+			c.Data = &ResultSet{Column: col, Result: res}
+			tmpl = "result"
 		default:
-			if strings.Contains(active, "browse="){
-				Render(w, "result", content)
-			}else{
-				Render(w, "main", content)
-			}
-
+			tmpl = "main"
 	}
+
+	Render(w, tmpl, c)
 }

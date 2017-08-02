@@ -6,8 +6,7 @@ type ResultSet struct{
 }
 
 type Content struct{
-	Tables []string
+	Tables map[string]bool
 	Data *ResultSet
 	Errors map[string]string
 }
-
