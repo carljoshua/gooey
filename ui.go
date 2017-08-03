@@ -21,7 +21,6 @@ func BuildUI() error {
 		if err != nil{
 			return err
 		}
-
 		ioutil.WriteFile("./UI/" + key, val, 0600)
 	}
 
@@ -31,7 +30,6 @@ func BuildUI() error {
 		if err != nil{
 			return err
 		}
-
 		ioutil.WriteFile("./UI/files/" + key, val, 0600)
 	}
 

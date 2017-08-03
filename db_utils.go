@@ -5,12 +5,12 @@ import (
 )
 
 type Connection struct{
-	name string	//Name of the driver
+	name string			//Name of the driver
 	driver *sql.DB 		//Driver of the Database
 }
 
 
-//GetRow() fetches a single row
+//GetRow fetches a single row
 func (c *Connection) GetRow(q string) (string, []string, error) {
 	var row []string
 	var tmp string
@@ -27,7 +27,7 @@ func (c *Connection) GetRow(q string) (string, []string, error) {
 	return col_name[0], row, nil
 }
 
-//GetRows() fetches multiple rows
+//GetRows fetches multiple rows
 func (c *Connection) GetRows(q string) ([]string, [][]string, error){
 	var rows [][]string
 	res, err := c.driver.Query(q)
@@ -48,7 +48,16 @@ func (c *Connection) GetRows(q string) ([]string, [][]string, error){
 	return col_names, rows, nil
 }
 
-// TableQ returns the query that shows the tables in the database
+//Execute runs the queries that have doesn't return rows
+func (c *Connection) Execute(q string) error{
+	_, err := c.driver.Exec(q)
+	if err != nil{
+		return err
+	}
+	return nil
+}
+
+//TableQ returns the query that shows the tables in the database
 func (c *Connection) TableQ() string{
 	var q string
 	switch c.name {
