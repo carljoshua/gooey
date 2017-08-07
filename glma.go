@@ -6,28 +6,29 @@ import(
 	"strings"
 )
 
+//The connection to the database
 var db *Connection
 
 // ResultSet is a container for the rows return by the query
 type ResultSet struct{
-	Column []string
-	Result [][]string
+	Column []string			//Column names of the rows
+	Result [][]string		//The Rows
 }
 
 // UIValues is used to store the data that the UI rely on (e.g Table list, name of selected table)
 type UIValues struct {
-	List []string
-	Active string
+	List []string			//List of the tables in the db
+	Active string			//Selected table
 	Panel map[string]bool
-	FailedQuery string
+	FailedQuery string		//If the query failed, this is where it is dumped
+	Errors []error			//Slice of Error because reasons
 }
 
 // Main interface where the data that will be passed into the template is stored
 type Content struct{
-	UI *UIValues
-	Data *ResultSet
+	UI *UIValues			//UI related params
+	Data *ResultSet			//Rows return by queries
 	Info []string
-	Errors []error
 }
 
 // Run starts the system and serves the UI and necessary files
@@ -49,7 +50,7 @@ func Process(w http.ResponseWriter, r *http.Request){
 	// gets the tables in the database
 	_, table_list, err := db.GetRow(db.GetQuery("table"))
 	if err != nil{
-		c.Errors = append(c.Errors, err)
+		c.UI.Errors = append(c.UI.Errors, err)
 	}else{
 		c.UI.List = table_list
 	}
@@ -67,7 +68,7 @@ func Process(w http.ResponseWriter, r *http.Request){
 		case "browse":
 			col, res, err := db.GetRows("SELECT * FROM " + table)
 			if err != nil{
-				c.Errors = append(c.Errors, err)
+				c.UI.Errors = append(c.UI.Errors, err)
 			}else{
 				c.Data = &ResultSet{Column: col, Result: res}
 			}
@@ -87,7 +88,7 @@ func Process(w http.ResponseWriter, r *http.Request){
 			if strings.Contains(q, "SELECT"){
 				col, res, err := db.GetRows(q)
 				if err != nil{
-					c.Errors = append(c.Errors, err)
+					c.UI.Errors = append(c.UI.Errors, err)
 					c.UI.FailedQuery = q
 					tmpl = "query"
 				}else{
@@ -98,15 +99,23 @@ func Process(w http.ResponseWriter, r *http.Request){
 				//If the query doesn't return rows
 				err = db.Execute(q)
 				if err != nil{
-					c.Errors = append(c.Errors, err)
+					c.UI.Errors = append(c.UI.Errors, err)
 					c.UI.FailedQuery = q
 				}
 				tmpl = "query"
 			}
 			p["sql"] = true
 
+		// structures of tables
 		case "structure":
-
+			col, res, err := db.GetRows(db.GetQuery("struct") + table)
+			if err != nil{
+				c.UI.Errors = append(c.UI.Errors, err)
+			}else{
+				c.Data = &ResultSet{Column: col, Result: res}
+			}
+			p["structure"] = true
+			tmpl = "structure"
 		default:
 			tmpl = "main"
 	}

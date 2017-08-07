@@ -64,6 +64,7 @@ func (c *Connection) GetQuery(z string) string{
 			queries["table"] = "SELECT name FROM sqlite_master WHERE type='table';"
 		case "mysql":
 		 	queries["table"] = "SHOW TABLES;"
+			queries["struct"] = "DESCRIBE "
 	}
 
 	return queries[z];
