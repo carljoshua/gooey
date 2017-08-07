@@ -9,7 +9,6 @@ type Connection struct{
 	driver *sql.DB 		//Driver of the Database
 }
 
-
 //GetRow fetches a single row
 func (c *Connection) GetRow(q string) (string, []string, error) {
 	var row []string
@@ -58,14 +57,14 @@ func (c *Connection) Execute(q string) error{
 }
 
 //TableQ returns the query that shows the tables in the database
-func (c *Connection) TableQ() string{
-	var q string
+func (c *Connection) GetQuery(z string) string{
+	queries := make(map[string]string)
 	switch c.name {
 		case "sqlite3":
-			q = "SELECT name FROM sqlite_master WHERE type='table';"
+			queries["table"] = "SELECT name FROM sqlite_master WHERE type='table';"
 		case "mysql":
-		 	q = "SHOW TABLES;"
+		 	queries["table"] = "SHOW TABLES;"
 	}
 
-	return q;
+	return queries[z];
 }
