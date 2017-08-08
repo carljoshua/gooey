@@ -15,7 +15,7 @@ Web-based GUI for managing databases (similar to PHPMyAdmin)
 	* Pure Go code
 	* Supports many database drivers
 		* MySQL
-		* Sqlite
+		* SQLite
 
 
 ## Requirements
