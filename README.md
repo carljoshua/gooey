@@ -49,3 +49,5 @@ golangmyadmin.Run(db, "sqlite3", ":8002")
 ```
 
 After running the code above, a folder named "UI" will be created in your project directory. This where the files of the website is stored. If you are planning to change the look of the user interface, you can edit or change the files in this folder.
+
+All you have to do now is to go to your browser of your choice and go to "localhost:(port number)/golangmyadmin" (e.g localhost:8002/golangmyadmin).
