@@ -48,7 +48,7 @@ func Process(w http.ResponseWriter, r *http.Request){
 	c := &Content{UI: &UIValues{}}
 
 	// gets the tables in the database
-	_, table_list, err := db.GetRow(db.GetQuery("table"))
+	_, table_list, err := db.GetRow(db.GetQuery("table", ""))
 	if err != nil{
 		c.UI.Errors = append(c.UI.Errors, err)
 	}else{
@@ -85,7 +85,7 @@ func Process(w http.ResponseWriter, r *http.Request){
 		case "result":
 			q := r.FormValue("query")
 			// if query contains SELECT
-			if strings.Contains(q, "SELECT"){
+			if strings.Contains(q, "SELECT") || strings.Contains(q, "PRAGMA"){
 				col, res, err := db.GetRows(q)
 				if err != nil{
 					c.UI.Errors = append(c.UI.Errors, err)
@@ -108,7 +108,7 @@ func Process(w http.ResponseWriter, r *http.Request){
 
 		// structures of tables
 		case "structure":
-			col, res, err := db.GetRows(db.GetQuery("struct") + table)
+			col, res, err := db.GetRows(db.GetQuery("struct", table))
 			if err != nil{
 				c.UI.Errors = append(c.UI.Errors, err)
 			}else{

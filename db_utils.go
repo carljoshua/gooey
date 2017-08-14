@@ -57,14 +57,15 @@ func (c *Connection) Execute(q string) error{
 }
 
 //TableQ returns the query that shows the tables in the database
-func (c *Connection) GetQuery(z string) string{
+func (c *Connection) GetQuery(z string, t string) string{
 	queries := make(map[string]string)
 	switch c.name {
 		case "sqlite3":
 			queries["table"] = "SELECT name FROM sqlite_master WHERE type='table';"
+			queries["struct"] = "PRAGMA TABLE_INFO(" + t + ")"
 		case "mysql":
 		 	queries["table"] = "SHOW TABLES;"
-			queries["struct"] = "DESCRIBE "
+			queries["struct"] = "DESCRIBE " + t
 	}
 
 	return queries[z];
