@@ -9,8 +9,9 @@ type Connection struct{
 	driver *sql.DB 		//Driver of the Database
 }
 
-//GetRow fetches a single row
-func (c *Connection) GetRow(q string) (string, []string, error) {
+
+//GetColumns fetches a single column
+func (c *Connection) GetColumn(q string) (string, []string, error) {
 	var row []string
 	var tmp string
 	res, err := c.driver.Query(q)
@@ -26,8 +27,8 @@ func (c *Connection) GetRow(q string) (string, []string, error) {
 	return col_name[0], row, nil
 }
 
-//GetRows fetches multiple rows
-func (c *Connection) GetRows(q string) ([]string, [][]string, error){
+//GetColumns fetches multiple columns
+func (c *Connection) GetColumns(q string) ([]string, [][]string, error){
 	var rows [][]string
 	res, err := c.driver.Query(q)
 	if err != nil{
@@ -54,19 +55,4 @@ func (c *Connection) Execute(q string) error{
 		return err
 	}
 	return nil
-}
-
-//TableQ returns the query that shows the tables in the database
-func (c *Connection) GetQuery(z string, t string) string{
-	queries := make(map[string]string)
-	switch c.name {
-		case "sqlite3":
-			queries["table"] = "SELECT name FROM sqlite_master WHERE type='table';"
-			queries["struct"] = "PRAGMA TABLE_INFO(" + t + ")"
-		case "mysql":
-		 	queries["table"] = "SHOW TABLES;"
-			queries["struct"] = "DESCRIBE " + t
-	}
-
-	return queries[z];
 }
