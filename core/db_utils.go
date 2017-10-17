@@ -1,20 +1,10 @@
-package golangmyadmin
-
-import (
-	"database/sql"
-)
-
-type Connection struct{
-	name string			//Name of the driver
-	driver *sql.DB 		//Driver of the Database
-}
-
+package core
 
 //GetColumns fetches a single column
 func (c *Connection) GetColumn(q string) (string, []string, error) {
 	var row []string
 	var tmp string
-	res, err := c.driver.Query(q)
+	res, err := c.database.Query(q)
 	if err != nil{
 		return "", nil, err
 	}
@@ -30,7 +20,7 @@ func (c *Connection) GetColumn(q string) (string, []string, error) {
 //GetColumns fetches multiple columns
 func (c *Connection) GetColumns(q string) ([]string, [][]string, error){
 	var rows [][]string
-	res, err := c.driver.Query(q)
+	res, err := c.database.Query(q)
 	if err != nil{
 		return nil, nil, err
 	}
@@ -50,7 +40,7 @@ func (c *Connection) GetColumns(q string) ([]string, [][]string, error){
 
 //Execute runs the queries that have doesn't return rows
 func (c *Connection) Execute(q string) error{
-	_, err := c.driver.Exec(q)
+	_, err := c.database.Exec(q)
 	if err != nil{
 		return err
 	}

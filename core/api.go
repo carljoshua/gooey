@@ -1,33 +1,35 @@
-package golangmyadmin
+// This package starts the api, handles the requests and return json responses for managing the database
+
+package core
 
 import(
 	"net/http"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 )
 
-var (
-	db *Connection
-)
+var c *Connection
 
-// Returns a mux which the api routes are added
-func NewMux(database *sql.DB, db_name string) *http.ServeMux{
-	db = &Connection{
-		name :	db_name,
-		driver : database}
+// Starts the api using the args sent
+func Start(db *sql.DB, driverName string, port string) {
+	c = &Connection{database: db, driver: driverName}
+	http.HandleFunc("/db", respond)
 
-	r := http.NewServeMux()
-	r.HandleFunc("/db", API)
-
-	return r
+	fmt.Println("Listening to port " + port + "...")
+	err := http.ListenAndServe(":" + port, nil)
+	if err != nil{
+		fmt.Println("Invalid Port Number" + port)
+	}
 }
 
-func API(w http.ResponseWriter, r *http.Request){
+// Handles the API requests and returns json responses
+func respond(w http.ResponseWriter, r *http.Request){
 	w.Header().Add("Content-type", "application/json")
 	resp := &Response{}
 
 	//get the tables in the database
-	_, tables, err := db.GetColumn("SHOW TABLES;")
+	_, tables, err := c.GetColumn("SHOW TABLES;")
 	if err != nil{
 		resp.Errors = append(resp.Errors, err)
 	}else{
@@ -45,7 +47,7 @@ func API(w http.ResponseWriter, r *http.Request){
 	//if the table has a value, get the structure
 	if r.URL.Query().Get("table") != ""{
 		//get the structure of the table
-		col, res, err := db.GetColumns("DESCRIBE " + r.URL.Query().Get("table"))
+		col, res, err := c.GetColumns("DESCRIBE " + r.URL.Query().Get("table"))
 		if err != nil{
 			resp.Errors = append(resp.Errors, err)
 		}else{
@@ -55,7 +57,7 @@ func API(w http.ResponseWriter, r *http.Request){
 
 	if q != ""{
 		//get the data from tables
-		col, res, err := db.GetColumns(q)
+		col, res, err := c.GetColumns(q)
 		if err != nil{
 			resp.Errors = append(resp.Errors, err)
 		}else{

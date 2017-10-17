@@ -1,53 +1,54 @@
-# GolangMyAdmin
+# Gooey
 
-Web-based GUI for managing databases (similar to PHPMyAdmin)
+Gooey is a command-line tool which creates web-based GUI that can be used to manage different types of database.
+
+This package also have a API for managing the database. The API can be found at http://localhost:8000/db if you use the default port number.
+
+Note: If you don't like the GUI, you can edit it in `$GOPATH/src/github.com/carljoshua/gooey/core/UI`. I am not the best designer so feel free to change it.
 
 ---------------------------------------
   * [Features](#features)
-  * [Requirements](#requirements)
-  *	[Warning](#warning)
   * [Installation](#installation)
   * [Usage](#usage)
+  * [Contributing](#contibuting)
 ---------------------------------------
 
 ## Features
 
-	* Pure Go code
-	* Supports many database drivers
+	* Pure Go code (Except for the GUI)
+    * Light-weight
+    * GUI is editable
+	* Supports different kinds of database
 		* MySQL
-		* SQLite
-
-
-## Requirements
-
-	* Go 1.8
-	* Third-party driver for Go's [database/sql](https://golang.org/pkg/database/sql/) package
+        * Sqlite3
 
 ---------------------------------------
-
-## Warning
-This package is meant for development purposes only. Do not release your project with this in your code because it doesn't have authentication procedures. Another reason is this package is not yet fully developed.
 
 ## Installation
 Make sure you have you set your GOPATH (https://github.com/golang/go/wiki/GOPATH).
 Type the command below to install the package.
 
 ```bash
-$ go get github.com/carljoshua/golangmyadmin
+$ go get github.com/carljoshua/gooey
 ```
 
 ## Usage
-Import the driver you like (I used Sqlite driver (https://github.com/mattn/go-sqlite3) in this example) and open a connection into the database. Pass the connection, the name of the driver and the port number where you want the GUI to be served into Run().
+In mysql:
 
-```go
-import "database/sql"
-import _ "github.com/mattn/go-sqlite3"
-import "github.com/carljoshua/golangmyadmin"
-
-db, _ := sql.Open("sqlite3", "resources.db")
-golangmyadmin.Run(db, "sqlite3", ":8002")
+```bash
+$ gooey -v mysql -d mydb -u root -p mypasswd
 ```
 
-After running the code above, a folder named "UI" will be created in your project directory. This where the files of the website is stored. If you are planning to change the look of the user interface, you can edit or change the files in this folder.
+In sqlite3:
 
-All you have to do now is to go to your browser of your choice and go to "localhost:(port number)/golangmyadmin" (e.g localhost:8002/golangmyadmin).
+```bash
+$ gooey -v sqlite3 -d ./mydatabase.db
+```
+
+The GUI can now be found at http://localhost:8000/gooey.
+
+## Contributing
+
+Fork it and create a new branch. If you have a working feature, create a pull request.
+
+I'll appreciate any contribution, suggestion or criticism.

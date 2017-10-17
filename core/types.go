@@ -1,4 +1,11 @@
-package golangmyadmin
+package core
+
+import "database/sql"
+
+type Connection struct {
+	database	*sql.DB
+	driver		string
+}
 
 type Response struct {
 	Tables		[]string	`json:"table"`
