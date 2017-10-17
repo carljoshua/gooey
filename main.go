@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-    driver := flag.String("v", "", "driver to use.\nSupported drivers: \n\tmysql\n\tsqlite3")
+    driver := flag.String("v", "", "driver to use.\n\nSupported drivers: \n\tmysql\n\tsqlite3")
     uname := flag.String("u", "", "username")
     passwd := flag.String("p", "", "password")
     dbname := flag.String("d", "", "database name/file path")
