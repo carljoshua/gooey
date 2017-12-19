@@ -14,19 +14,17 @@ Note: If you don't like the GUI, you can edit it in `$GOPATH/src/github.com/carl
 ---------------------------------------
 
 ## Features
-
-	* Pure Go code (Except for the GUI)
+    * Pure Go code (Except for the GUI)
     * Light-weight
     * GUI is editable
-	* Supports different kinds of database
-		* MySQL
+    * Supports different kinds of database
+    	* MySQL
         * Sqlite3
 
 ---------------------------------------
 
 ## Installation
-Make sure you have you set your GOPATH (https://github.com/golang/go/wiki/GOPATH).
-Type the command below to install the package.
+Make sure you have you set your GOPATH (https://github.com/golang/go/wiki/GOPATH). Type the command below to install the package.
 
 ```bash
 $ go get github.com/carljoshua/gooey
@@ -48,7 +46,6 @@ $ gooey -v sqlite3 -d ./mydatabase.db
 The GUI can now be found at http://localhost:8000/gooey.
 
 ## Contributing
-
 Fork it and create a new branch. If you have a working feature, create a pull request.
 
 I'll appreciate any contribution, suggestion or criticism.

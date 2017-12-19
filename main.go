@@ -1,5 +1,4 @@
 // Gooey is a command-line tool which creates web-based GUI that can be used to manage different types of database.
-
 package main
 
 import (
@@ -18,7 +17,6 @@ func main() {
     uname := flag.String("u", "", "username")
     passwd := flag.String("p", "", "password")
     dbname := flag.String("d", "", "database name/file path")
-    port := flag.String("n", "8000", "port number")
 	flag.Parse()
 
     var data string
@@ -28,7 +26,7 @@ func main() {
     case "sqlite3":
         data = *dbname
     default:
-        fmt.Printf("Missing or Invalid Driver: %s\n", *driver)
+        fmt.Println("Missing or Invalid Driver")
         os.Exit(1)
     }
 
@@ -39,7 +37,7 @@ func main() {
     }
 
     test(db, *driver, *dbname)
-    core.Start(db, *driver, *port)
+    core.Start(db, *driver)
 }
 
 //Test if the the system has connected to the database  successfully

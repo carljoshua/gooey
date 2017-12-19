@@ -7,14 +7,13 @@ type Connection struct {
 	driver		string
 }
 
-type Response struct {
-	Tables		[]string	`json:"table"`
-	Structure	*Data		`json:"structure"`
-	Dataset		*Data		`json:"dataset"`
-	Errors		[]error		`json:"error"`
+type Dataset struct {
+	Columns		[]string	`json:"col_names"`
+	Rows		[][]string	`json:"rows"`
+	Message 	error		`json:"error"`
 }
 
-type Data struct {
-	Column		[]string	`json:"column_name"`
-	Rows		[][]string	`json:"data"`
+type TableList struct {
+	Tables 		[]string	`json:"tables"`
+	Message 	error		`json:"error"`
 }
