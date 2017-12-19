@@ -1,10 +1,8 @@
-# Gooey
+# Gooey (work in progress)
 
 Gooey is a command-line tool which creates web-based GUI that can be used to manage different types of database.
 
-This package also have a API for managing the database. The API can be found at http://localhost:8000/db if you use the default port number.
-
-Note: If you don't like the GUI, you can edit it in `$GOPATH/src/github.com/carljoshua/gooey/core/UI`. I am not the best designer so feel free to change it.
+Note: If you don't like the GUI, you can edit it in `$GOPATH/src/github.com/carljoshua/gooey/client`. I am not the best designer so feel free to change it. 
 
 ---------------------------------------
   * [Features](#features)
@@ -14,7 +12,7 @@ Note: If you don't like the GUI, you can edit it in `$GOPATH/src/github.com/carl
 ---------------------------------------
 
 ## Features
-    * Pure Go code (Except for the GUI)
+    * Pure Go code
     * Light-weight
     * GUI is editable
     * Supports different kinds of database
